@@ -2,3 +2,8 @@
 
 %:
 	dh $@
+
+execute_before_dh_gencontrol:
+	echo "DEB-HOST-ARCH-BITS=$(DEB_HOST_ARCH_BITS)" >> debian/architecture-properties.substvars
+	echo "DEB-HOST-ARCH-ENDIAN=$(DEB_HOST_ARCH_ENDIAN)" >> debian/architecture-properties.substvars
+

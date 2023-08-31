@@ -1,5 +1,11 @@
-template-repository (1.0-1) unstable; urgency=medium
+architecture-properties (0.1.1) unstable; urgency=medium
 
-  * Initial release
+  * Upload to unstable.
 
- -- Tsic404 <liuheng@deepin.org>  Sat, 28 Jan 2023 13:46:49 +0800
+ -- Niels Thykier <niels@thykier.net>  Mon, 19 Dec 2022 20:52:18 +0000
+
+architecture-properties (0.1) experimental; urgency=medium
+
+  * Initial release.
+
+ -- Niels Thykier <niels@thykier.net>  Wed, 14 Dec 2022 14:00:16 +0000
