@@ -1,15 +1,28 @@
-Source: template-repository
-Section: unknown
+Source: architecture-properties
+Section: devel
 Priority: optional
-Maintainer: Tsic404 <liuheng@deepin.org>
-Build-Depends: debhelper (>= 11)
-Standards-Version: 4.1.3
-Homepage: https://github.com/deepin-community/template-repository
-#Vcs-Browser: https://salsa.debian.org/debian/deepin-community-template-repository
-#Vcs-Git: https://salsa.debian.org/debian/deepin-community-template-repository.git
+Maintainer: Architecture Properties Maintainers <achitecture-properties@packages.debian.org>
+Uploaders: Niels Thykier <niels@thykier.net>,
+Build-Depends: debhelper-compat (= 13)
+Rules-Requires-Root: no
+Standards-Version: 4.6.1
+Vcs-Git: https://salsa.debian.org/debian/architecture-properties.git
+Vcs-Browser: https://salsa.debian.org/debian/architecture-properties
 
-Package: template-repository
+Package: architecture-properties
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Multi-Arch: same
+Provides: architecture-is-${DEB-HOST-ARCH-BITS}-bit,
+          architecture-is-${DEB-HOST-ARCH-ENDIAN}-endian
+Description: Declarative architecture constraints
+ This is a meta package that provide declarative architecture
+ constraints like "architecture-is-64-bit" or
+ "architecture-is-little-endian" for cases where architecture
+ wildcard support in the Architecture field is insufficient.
+ .
+ Example usage: "Build-Depends: architecture-is-64-bit".
+ .
+ This package is provided solely for the purpose of being used
+ in build-dependencies to simplify management of architecture
+ support.
+
