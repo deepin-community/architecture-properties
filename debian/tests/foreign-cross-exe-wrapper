@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -eu
+
+die() {
+	echo "$*"
+	exit 1
+}
+
+DEB_HOST_ARCH=$(dpkg --print-architecture)
+
+ARCHITECTURES="amd64 arm64 armel armhf i386 mips64el ppc64el riscv64 s390x"
+
+for arch in $ARCHITECTURES; do
+	test "$arch" = "$DEB_HOST_ARCH" && continue
+	test "$DEB_HOST_ARCH" = amd64 -a "$arch" = i386 && continue
+	dpkg --add-architecture "$arch"
+done
+
+apt-get update
+
+TESTED_ARCHS=
+for arch in $ARCHITECTURES; do
+	test "$arch" = "$DEB_HOST_ARCH" && continue
+	test "$DEB_HOST_ARCH" = amd64 -a "$arch" = i386 && continue
+
+	if ! apt-get -y install --no-install-recommends cross-exe-wrapper "cross-exe-wrapper:$arch" "busybox:$arch" 2>&1; then
+		echo "Skipping foreign test for $arch due to an installation problem"
+		continue
+	fi
+
+	multiarch=$(dpkg-architecture "-a$arch" -qDEB_HOST_MULTIARCH 2>/dev/null)
+	gnutype=$(dpkg-architecture "-a$arch" -qDEB_HOST_GNU_TYPE 2>/dev/null)
+
+	# We expect no output and an exit code of 0 or 1
+	rc=0
+	output=$("/usr/lib/$multiarch/cross-exe-wrapper/cross-exe-test" 2>&1) || rc=$?
+	test "$rc" = 2 && die "cross-exe-test exited $rc for $arch with output $output"
+
+	if ! "qemu-$arch" /bin/busybox true 2>&1; then
+		echo "Skipping foreign test for $arch because qemu-$arch didn't work"
+		continue
+	fi
+
+	# Expect successful exit
+	"$gnutype-cross-exe-wrapper" /bin/busybox true
+
+	# Expect argument to be forwarded to echo
+	"$gnutype-cross-exe-wrapper" /bin/busybox echo wrapper-works | grep -q wrapper-works
+
+	TESTED_ARCHS="$TESTED_ARCHS $arch"
+done
+
+if test -z "$TESTED_ARCHS"; then
+	exit 77
+fi

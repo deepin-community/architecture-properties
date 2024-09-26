@@ -1,0 +1,2 @@
+${DEB_HOST_GNU_TYPE}-cross-exe-wrapper usr/bin
+cross-exe-test usr/lib/${DEB_HOST_MULTIARCH}/cross-exe-wrapper/

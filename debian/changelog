@@ -1,3 +1,47 @@
+architecture-properties (0.2.3) unstable; urgency=medium
+
+  [ Simon McVittie ]
+  * d/tests/foreign-cross-exe-wrapper: Suppress stderr of failing
+    qemu-$arch. (Closes: #1081799)
+
+ -- Niels Thykier <niels@thykier.net>  Fri, 20 Sep 2024 12:05:01 +0000
+
+architecture-properties (0.2.2) unstable; urgency=medium
+
+  [ Simon McVittie ]
+  * d/tests/foreign-cross-exe-wrapper: Make sure rc is initialized
+  * d/tests/control: Skip testing foreign-cross-exe-wrapper if qemu fails
+    (Closes: #1081799)
+  * d/tests: Install additional packages with --no-install-recommends
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 15 Sep 2024 05:31:39 +0000
+
+architecture-properties (0.2.1) unstable; urgency=medium
+
+  * Source-only upload now that 0.2 passed NEW.
+  * Fixed some problems with the autopkgtests that were not possible
+    to test with the current salsa-ci setup.
+    Thanks Helmut Grohne <helmut@subdivi.de>
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 14 Sep 2024 09:56:23 +0000
+
+architecture-properties (0.2) unstable; urgency=medium
+
+  [ Christoph Berg ]
+  * Fix typo in maintainer email address.
+
+  [ Helmut Grohne ]
+  * Add cross-exe-wrapper package and supporting packages
+  * add autopkgtests for cross-exe-wrapper
+  * cross-exe-wrapper.in: document exit codes of cross-exe-test
+  * debian/rules: drop inclusion of architecture.mk
+  * enable the default salsa-ci pipeline
+  * cross-exe-test.c: fix FTBFS with gcc-14
+  * cross-exe-wrapper: fix blhc
+  * make autopkgtests skippable
+
+ -- Niels Thykier <niels@thykier.net>  Fri, 13 Sep 2024 14:43:52 +0000
+
 architecture-properties (0.1.1) unstable; urgency=medium
 
   * Upload to unstable.

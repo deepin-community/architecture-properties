@@ -1,0 +1,66 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+: <<'POD2MAN'
+=head1 NAME
+
+<gnu-triplet>-cross-exe-wrapper - Run an executable using CPU emulation if needed
+
+=head1 SYNOPSIS
+
+<I<gnu-triplet>>B<-cross-exe-wrapper> <I<executable>> [I<options>]
+
+=head1 DESCRIPTION
+
+<I<gnu-triplet>>B<-cross-exe-wrapper> can be used to wrap a program compiled the architecture designated by its prefix in GNU triplet form.
+If the CPU happens to be able to run the program directly, it is run without emulation.
+The personality(2) of the execution environment is adjusted if necessary.
+The first argument must be a full path to the target executable.
+All further arguments are forwarded to the target executable.
+
+=head1 SEE ALSO
+
+L<qemu-user(1)>, L<qemu-user-static(1)>, L<personality(2)>
+
+=cut
+POD2MAN
+
+if test "$(dpkg --print-architecture)" = #DEB_HOST_ARCH#; then
+	exec "$@"
+fi
+
+cross_exe_test_output=$(/usr/lib/#DEB_HOST_MULTIARCH#/cross-exe-wrapper/cross-exe-test 2>&1)
+cross_exe_test_result=$?
+# Meaning of return codes:
+# 0: cross-exe-test is running having detected any emulation.
+# 1: cross-exe-test is running inside some kind of emulator.
+# 2: cross-exe-test was running, but experienced an error with a message. Should not happen.
+# 126 observed on amd64: The kernel cannot run the cross-exe-test ELF binary.
+# *: Assume all other return values hint at foreign architecture execution failure.
+if test "$cross_exe_test_result" = 0; then
+	case #DEB_HOST_ARCH# in
+		amd64|x32)
+			exec setarch linux64 -- "$@"
+		;;
+		armel|armhf|i386|mipsel|powerpc|sparc)
+			exec setarch linux32 -- "$@"
+		;;
+	esac
+	exec "$@"
+fi
+
+if test "$cross_exe_test_result" = 2; then
+	echo "$cross_exe_test_output" >&2
+	exit 126
+fi
+
+if command -v qemu-#DEB_HOST_ARCH# >/dev/null; then
+	exec qemu-#DEB_HOST_ARCH# -- "$@"
+fi
+
+if command -v qemu-#DEB_HOST_ARCH#-static >/dev/null; then
+	exec qemu-#DEB_HOST_ARCH#-static -- "$@"
+fi
+
+echo "$0: failed to locate emulator for #DEB_HOST_ARCH#" >&2
+exit 126
