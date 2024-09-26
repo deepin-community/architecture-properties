@@ -1,0 +1,11 @@
+Tests: native-cross-exe-wrapper
+Depends: cross-exe-wrapper, dpkg-dev
+
+Tests: sibling-cross-exe-wrapper
+Architecture: amd64
+Depends: cross-exe-wrapper
+Restrictions: needs-root, breaks-testbed, skippable
+
+Tests: foreign-cross-exe-wrapper
+Depends: cross-exe-wrapper, dpkg-dev
+Restrictions: needs-root, breaks-testbed, skippable

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -eu
+
+die() {
+	echo "$*"
+	exit 1
+}
+
+# Verify that the native case is satisfied without qemu
+dpkg-query -W qemu-user 2>/dev/null || die "qemu-user is installed"
+dpkg-query -W qemu-user-static 2>/dev/null || die "qemu-user-static is installed"
+
+DEB_HOST_MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null)
+DEB_HOST_GNU_TYPE=$(dpkg-architecture -qDEB_HOST_GNU_TYPE 2>/dev/null)
+
+# Expect successful exit with no stderr output
+"/usr/lib/$DEB_HOST_MULTIARCH/cross-exe-wrapper/cross-exe-test"
+
+# Expect successful exit
+"$DEB_HOST_GNU_TYPE-cross-exe-wrapper" /bin/true
+
+# Expect argument to be forwarded to echo
+"$DEB_HOST_GNU_TYPE-cross-exe-wrapper" /bin/echo wrapper-works | grep -q wrapper-works

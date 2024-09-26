@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -eu
+
+die() {
+	echo "$*"
+	exit 1
+}
+
+
+test "$(dpkg --print-architecture)" = amd64
+
+dpkg --add-architecture i386
+
+apt-get update
+
+# Avoid emitting to stderr as that fails the test and we do not want to
+# paper over it with allow-stderr
+if ! apt-get install --no-install-recommends -y cross-exe-wrapper cross-exe-wrapper:i386 busybox:i386 2>&1; then
+	# Skip test if packages are unavailable.
+	exit 77
+fi
+
+# Verify that the native case is satisfied without qemu
+dpkg-query -W qemu-user 2>/dev/null || die "qemu-user is installed"
+dpkg-query -W qemu-user-static 2>/dev/null || die "qemu-user-static is installed"
+
+# Expect successful exit with no stderr output
+/usr/lib/i386-linux-gnu/cross-exe-wrapper/cross-exe-test
+
+# Expect successful exit
+i686-linux-gnu-cross-exe-wrapper /bin/busybox true
+
+# Expect argument to be forwarded to echo
+i686-linux-gnu-cross-exe-wrapper /bin/busybox echo wrapper-works | grep -q wrapper-works
